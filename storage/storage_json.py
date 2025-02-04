@@ -1,6 +1,6 @@
 import json
 import os
-from istorage import IStorage
+from .istorage import IStorage
 
 class StorageJson(IStorage):
 
@@ -53,11 +53,14 @@ class StorageJson(IStorage):
         Internal helper method to load movie data from the JSON file.
         Returns an empty dictionary if the file doesn't exist or the JSON is invalid.
         """
-        if not os.path.exists(self.file_path):
+        # Load the file from the data directory
+        file_path = os.path.join('data', os.path.basename(self.file_path))
+        
+        if not os.path.exists(file_path):
             return {}
 
         try:
-            with open(self.file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except (json.JSONDecodeError, OSError):
             return {}
@@ -66,5 +69,10 @@ class StorageJson(IStorage):
         """
         Internal helper method to save the dictionary of movies back to the JSON file.
         """
-        with open(self.file_path, 'w', encoding='utf-8') as f:
+        # Ensure the data directory exists
+        os.makedirs('data', exist_ok=True)
+        
+        # Save the file in the data directory
+        file_path = os.path.join('data', os.path.basename(self.file_path))
+        with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
